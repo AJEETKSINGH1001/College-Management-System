@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - College Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% load static %}
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+        }
+
+        .dashboard-section {
+            padding: 50px;
+            background-color: #f4f7fc;
+        }
+
+        .dashboard-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: green; /* Changed color to green */
+        }
+
+        h3 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logout-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .logout-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #ff4b5c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-button:hover {
+            background-color: #d43f4b;
+        }
+
+        .logout-button:focus {
+            outline: none;
+        }
+
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        footer {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+
+        .footer-text {
+            margin: 0;
+        }
+
+        .student-info {
+            margin-bottom: 30px;
+        }
+
+        .student-info h3 {
+            margin-bottom: 15px;
+        }
+
+        .student-info p {
+            margin-bottom: 5px;
+        }
+
+        .id-card {
+            margin-top: 30px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 20px;
+            background-color: white;
+        }
+
+        /* Crop profile image to 150x150px and make it round */
+        .profile-image {
+            width: 150px;
+            height: 150px;
+            overflow: hidden;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .profile-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .id-card img {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            margin-bottom: 10px;
+            border: 2px solid #007bff;
+        }
+
+        .id-card h4 {
+            color: #007bff;
+            margin: 5px 0;
+        }
+
+        .id-card p {
+            margin: 2px 0;
+            font-size: 14px;
+        }
+
+        .id-card-footer {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .download-button {
+            margin-top: 10px;
+            display: inline-block;
+            padding: 8px 15px;
+            font-size: 14px;
+            color: white;
+            background-color: #28a745;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .download-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <h1>College Management System</h1>
+        </div>
+    </header>
+
+    <div class="dashboard-section">
+        <div class="container">
+            <div class="dashboard-container">
+                <!-- General welcome message -->
+                <h2>Welcome to the Student Dashboard</h2>
+
+                <!-- Personalized greeting -->
+                <h3>Hello, {{ user.first_name }} {{ user.last_name }}!</h3>
+
+                <!-- Display logout button -->
+                <div class="logout-container">
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="logout-button">Logout</button>
+                    </form>
+                </div>
+
+                <!-- Student Profile Image -->
+                <div class="profile-image">
+                    {% if user.student_profile.profile_image %}
+                        <img src="{{ user.student_profile.profile_image.url }}" alt="Profile Image">
+                    {% else %}
+                        <img src="{% static 'default_profile.png' %}" alt="Default Profile Image">
+                    {% endif %}
+                </div>
+
+                <!-- Student Information -->
+                <div class="student-info">
+                    <h3>Your Profile Information</h3>
+                    <p><strong>Enrollment Number:</strong> {{ user.student_profile.enrollment_number }}</p>
+                    <p><strong>Name:</strong> {{ user.student_profile.first_name }} {{ user.student_profile.last_name }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    <p><strong>Phone:</strong> {{ user.student_profile.phone_number }}</p>
+                    <p><strong>Date of Birth:</strong> {{ user.student_profile.date_of_birth }}</p>
+                    <p><strong>Address:</strong> {{ user.student_profile.address }}</p>
+                    <p><strong>Admission Date:</strong> {{ user.student_profile.admission_date }}</p>
+                    <p><strong>Fee Paid:</strong> {{ user.student_profile.fee_paid|yesno:"Yes,No" }}</p>
+                </div>
+
+                <!-- Student ID Card -->
+                <div class="id-card">
+                    <img src="{{ user.student_profile.profile_image.url }}" alt="Profile Image">
+                    <h4>{{ user.student_profile.first_name }} {{ user.student_profile.last_name }}</h4>
+                    <p><strong>Enrollment:</strong> {{ user.student_profile.enrollment_number }}</p>
+                    <p><strong>Contact Number:</strong> {{ user.student_profile.phone_number }}</p>
+                    <p><strong>Date of Birth:</strong> {{ user.student_profile.date_of_birth }}</p>
+                    <p><strong>Address:</strong> {{ user.student_profile.address }}</p>
+                    <div class="id-card-footer">© 2024 College Management System</div>
+
+                    <!-- Button to download ID card -->
+                    <a href="{% url 'student_id_card_pdf' user.student_profile.id %}" class="download-button">
+                        Download ID Card
+                    </a>
+                </div>
+
+                <!-- Dashboard Links -->
+                <div class="dashboard-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#">View Courses</a></li>
+                        <li><a href="#">Check Grades</a></li>
+                        <li><a href="#">View Attendance</a></li>
+                        <li><a href="#">Update Profile</a></li>
+                        <li><a href="#">Download Documents</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p class="footer-text">© 2024 College Management System</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>

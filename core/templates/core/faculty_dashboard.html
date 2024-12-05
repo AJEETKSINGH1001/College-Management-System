@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Dashboard - College Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+        }
+
+        .dashboard-section {
+            padding: 50px;
+            background-color: #f4f7fc;
+        }
+
+        .dashboard-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logout-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .logout-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #ff4b5c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-button:hover {
+            background-color: #d43f4b;
+        }
+
+        .logout-button:focus {
+            outline: none;
+        }
+
+        /* Header and Footer Styling */
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        footer {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+
+        .footer-text {
+            margin: 0;
+        }
+
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <h1>College Management System</h1>
+        </div>
+    </header>
+
+    <div class="dashboard-section">
+        <div class="container">
+            <div class="dashboard-container">
+                <!-- General welcome message -->
+                <h2>Welcome to Faculty Dashboard</h2>
+
+                <!-- Personalized welcome message -->
+                <h3>Hello, {{ user.first_name }} {{ user.last_name }}!</h3>
+
+                <!-- Display logout button -->
+                <div class="logout-container">
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="logout-button">Logout</button>
+                    </form>
+                </div>
+
+                <p>Here you can manage your classes, view students, and access various faculty resources.</p>
+
+                <!-- Example faculty-specific content -->
+                <ul>
+                    <li><a href="#">View Classes</a></li>
+                    <li><a href="#">Manage Students</a></li>
+                    <li><a href="#">Course Materials</a></li>
+                    <li><a href="#">Faculty Resources</a></li>
+                    <!-- Add more faculty-specific functionalities here -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p class="footer-text">© 2024 College Management System</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>

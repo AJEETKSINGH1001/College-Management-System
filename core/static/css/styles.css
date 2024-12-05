@@ -1,0 +1,6 @@
+/* static/css/styles.css */
+.hero-section {
+    background: url('/static/images/college-campus.jpg') no-repeat center center;
+    background-size: cover;
+    color: white;
+}
