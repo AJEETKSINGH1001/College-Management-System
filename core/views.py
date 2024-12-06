@@ -21,7 +21,10 @@ from django.contrib.auth.decorators import login_required
 from .models import Student
 from .decorators import role_required
 from reportlab.lib import colors
-
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Faculty
+from .forms import FacultyForm
+from django.contrib.admin.views.decorators import staff_member_required
 
 # Home page view
 def home(request):
@@ -231,3 +234,76 @@ def student_id_card_pdf(request, student_id, user=None):
     buffer.close()
 
     return response
+
+
+def pay_fee(request):
+    return render(request, 'core/pay_fee.html')  # Ensure this points to your HTML file
+
+
+@staff_member_required
+def faculty_list(request):
+    faculty_members = Faculty.objects.all()
+    return render(request, 'faculty/faculty_list.html', {'faculty_members': faculty_members})
+
+# Add a new faculty profile
+def add_faculty(request):
+    if request.method == "POST":
+        form = FacultyForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('faculty_list')
+    else:
+        form = FacultyForm()
+    return render(request, 'faculty/add_faculty.html', {'form': form})
+
+from core.forms import FacultyForm
+
+
+class UpdateView:
+    pass
+
+
+def reverse_lazy(param):
+    pass
+
+
+class FacultyUpdateView(UpdateView):
+    model = Faculty
+    form_class = FacultyForm
+    template_name = 'faculty_edit.html'
+    success_url = reverse_lazy('faculty_list')  # Redirect after successful edit
+
+# View a specific faculty profile
+def faculty_detail(request, pk):
+    faculty = get_object_or_404(Faculty, pk=pk)
+    return render(request, 'faculty/faculty_detail.html', {'faculty': faculty})
+
+
+def edit_faculty(request, pk):
+    faculty = get_object_or_404(Faculty, pk=pk)
+    if request.method == 'POST':
+        form = FacultyForm(request.POST, request.FILES, instance=faculty)
+        if form.is_valid():
+            form.save()
+            return redirect('faculty_detail', pk=faculty.pk)
+    else:
+        form = FacultyForm(instance=faculty)
+    return render(request, 'faculty/faculty_edit.html', {'form': form, 'faculty': faculty})
+
+
+from django.urls import reverse_lazy
+from django.views.generic import DeleteView
+from core.models import Faculty
+
+class FacultyDeleteView(DeleteView):
+    model = Faculty
+    template_name = 'faculty_confirm_delete.html'
+    success_url = reverse_lazy('faculty_list')  # Redirect after successful deletion
+
+
+def delete_faculty(request, pk):
+    faculty = get_object_or_404(Faculty, pk=pk)
+    if request.method == 'POST':
+        faculty.delete()
+        return redirect('faculty_list')
+    return redirect('faculty_detail', pk=pk)

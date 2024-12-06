@@ -19,6 +19,12 @@ urlpatterns = [
     #path('view_attendance/', views.view_attendance, name='view_attendance'),
     #path('student-id-card/<int:student_id>/', views.student_id_card, name='student_id_card'),
     path('student-id-card-pdf/<int:student_id>/', views.student_id_card_pdf, name='student_id_card_pdf'),
+    path('student-dashboard/pay_fee/', views.pay_fee, name='pay_fee'),
+    path('faculty/', views.faculty_list, name='faculty_list'),
+    path('faculty/add/', views.add_faculty, name='add_faculty'),
+    path('faculty/<int:pk>/', views.faculty_detail, name='faculty_detail'),
+    path('faculty/<int:pk>/edit/', views.edit_faculty, name='edit_faculty'),
+    path('faculty/<int:pk>/delete/', views.delete_faculty, name='delete_faculty'),
 ]
 
 # Serve media files during development (only for local development, not in production)

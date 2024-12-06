@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Detail</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Faculty Detail</h2>
+        <div class="card">
+            <div class="card-body">
+                {% if faculty.profile_picture %}
+                <img src="{{ faculty.profile_picture.url }}" alt="{{ faculty.name }}" class="img-thumbnail mb-3" style="width: 150px; height: 150px;">
+                {% endif %}
+                <h4>{{ faculty.name }}</h4>
+                <p><strong>Email:</strong> {{ faculty.email }}</p>
+                <p><strong>Phone:</strong> {{ faculty.phone }}</p>
+                <p><strong>Qualification:</strong> {{ faculty.qualification }}</p>
+                <p><strong>Experience:</strong> {{ faculty.experience }} years</p>
+                <p><strong>Subjects Taught:</strong> {{ faculty.subjects_taught }}</p>
+                <a href="{% url 'faculty_list' %}" class="btn btn-secondary">Back</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Profiles - College Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+        }
+
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+        }
+
+        footer {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+
+        .content-section {
+            padding: 50px 0;
+        }
+
+        .faculty-table {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .faculty-table th, .faculty-table td {
+            text-align: center;
+        }
+
+        .faculty-table img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+        }
+
+        .add-faculty-btn {
+            background-color: #28a745;
+            color: white;
+            font-weight: bold;
+        }
+
+        .add-faculty-btn:hover {
+            background-color: #218838;
+            color: white;
+        }
+
+        .view-btn, .edit-btn, .delete-btn {
+            font-size: 14px;
+        }
+
+        .view-btn {
+            background-color: #17a2b8;
+        }
+
+        .view-btn:hover {
+            background-color: #138496;
+        }
+
+        .edit-btn {
+            background-color: #ffc107;
+        }
+
+        .edit-btn:hover {
+            background-color: #e0a800;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .faculty-table {
+                padding: 15px;
+            }
+
+            .faculty-table th, .faculty-table td {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <h1>College Management System</h1>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <div class="container content-section">
+        <div class="faculty-table">
+            <h2 class="text-center mb-4">Faculty Profiles</h2>
+
+            <!-- Add Faculty Button -->
+            <div class="text-end mb-3">
+                <a href="{% url 'add_faculty' %}" class="btn add-faculty-btn">Add Faculty</a>
+            </div>
+
+            <!-- Faculty Table -->
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Profile Picture</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for faculty in faculty_members %}
+                    <tr>
+                        <td>
+                            {% if faculty.profile_picture %}
+                            <img src="{{ faculty.profile_picture.url }}" alt="{{ faculty.name }}" class="img-thumbnail">
+                            {% else %}
+                            No Image
+                            {% endif %}
+                        </td>
+                        <td>{{ faculty.name }}</td>
+                        <td>{{ faculty.email }}</td>
+                        <td>{{ faculty.phone }}</td>
+                        <td>
+                            <a href="{% url 'faculty_detail' faculty.pk %}" class="btn view-btn btn-sm">View</a>
+                            <a href="{% url 'edit_faculty' faculty.pk %}" class="btn edit-btn btn-sm">Edit</a>
+                            <a href="{% url 'delete_faculty' faculty.pk %}" class="btn delete-btn btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2024 College Management System</p>
+    </footer>
+
+</body>
+
+</html>

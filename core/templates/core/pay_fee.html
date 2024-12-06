@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pay Fee - College Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% load static %}
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+        }
+
+        .dashboard-section {
+            padding: 50px;
+            background-color: #f4f7fc;
+        }
+
+        .dashboard-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: green;
+        }
+
+        h3 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logout-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .logout-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #ff4b5c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-button:hover {
+            background-color: #d43f4b;
+        }
+
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        footer {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+
+        .footer-text {
+            margin: 0;
+        }
+
+        .pay-fee-container {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .qr-code {
+            margin: 20px auto;
+            text-align: center;
+            width: 200px;
+            height: 200px;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+        }
+
+        .qr-code img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .bank-details {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .bank-details p {
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .important-instructions {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            color: #721c24;
+        }
+
+        .important-instructions h4 {
+            margin-bottom: 10px;
+        }
+
+        .dashboard-links ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .dashboard-links ul li {
+            margin: 10px 0;
+        }
+
+        .dashboard-links ul li a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <h1>College Management System</h1>
+        </div>
+    </header>
+
+    <div class="dashboard-section">
+        <div class="container">
+            <div class="dashboard-container">
+                <h2>Fee Payment Information</h2>
+
+                <!-- Payment Instructions -->
+                <div class="pay-fee-container">
+                    <h3>Pay via UPI</h3>
+                    <p>Scan the QR code below or use the UPI ID to make the payment.</p>
+
+                    <!-- UPI QR Code -->
+                    <div class="qr-code">
+                        <img src="{% static 'images/qr_code.png' %}" alt="College UPI QR Code">
+                    </div>
+
+                    <p><strong>UPI ID:</strong> collegeupi@bank</p>
+
+                    <!-- Bank Account Details -->
+                    <div class="bank-details">
+                        <h3>Bank Details</h3>
+                        <p><strong>Account Holder Name:</strong> College Name</p>
+                        <p><strong>Account Number:</strong> 123456789012</p>
+                        <p><strong>IFSC Code:</strong> BANK1234</p>
+                        <p><strong>Bank Name:</strong> XYZ Bank</p>
+                    </div>
+                </div>
+
+                <!-- Important Instructions -->
+                <div class="important-instructions">
+                    <h4>Important Instructions:</h4>
+                    <ul>
+                        <li>
+                            After completing the payment, it is mandatory to submit the payment receipt to the finance office of the college.
+                            <br><strong>भुगतान पूरा करने के बाद, भुगतान रसीद को कॉलेज के वित्त कार्यालय में जमा करना अनिवार्य है।</strong>
+                        </li>
+                        <li>
+                            Failure to submit the receipt may result in the fee status not being updated in your student record.
+                            <br><strong>रसीद जमा न करने पर आपकी फीस की स्थिति आपके छात्र रिकॉर्ड में अपडेट नहीं हो सकती है।</strong>
+                        </li>
+                        <li>
+                            Ensure to mention your Enrollment Number on the payment receipt for identification.
+                            <br><strong>पहचान के लिए भुगतान रसीद पर अपना नामांकन संख्या (Enrollment Number) लिखना सुनिश्चित करें।</strong>
+                        </li>
+                        <li>
+                            Payments made via other methods (such as cash or checks) should be directly handled at the finance office.
+                            <br><strong>नकद या चेक जैसे अन्य तरीकों से किए गए भुगतान सीधे वित्त कार्यालय में जमा करें।</strong>
+                        </li>
+                        <li>
+                            Keep a copy of the payment receipt for future reference.
+                            <br><strong>भविष्य के संदर्भ के लिए भुगतान रसीद की एक प्रति अपने पास रखें।</strong>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Back to Dashboard -->
+                <div class="text-center mt-4">
+                    <a href="{% url 'student_dashboard' %}" class="btn btn-primary">Back to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p class="footer-text">© 2024 College Management System</p>
+        </div>
+    </footer>
+</body>
+
+</html>

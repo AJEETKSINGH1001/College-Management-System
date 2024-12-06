@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Detail</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* ================================================================
+            General Styles
+        ================================================================ */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* ================================================================
+            Header Styles
+        ================================================================ */
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        /* ================================================================
+            Footer Styles
+        ================================================================ */
+        footer {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+
+        /* ================================================================
+            Container and Content Styling
+        ================================================================ */
+        .container {
+            padding: 50px 15px;
+        }
+
+        .faculty-detail-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .faculty-detail-card img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .faculty-detail-card h4 {
+            color: #333;
+            margin-top: 20px;
+            font-size: 24px;
+        }
+
+        .faculty-detail-card p {
+            color: #555;
+            font-size: 16px;
+        }
+
+        .faculty-detail-card .btn {
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .faculty-detail-card .btn-warning {
+            background-color: #ffc107;
+        }
+
+        .faculty-detail-card .btn-warning:hover {
+            background-color: #e0a800;
+        }
+
+        .faculty-detail-card .btn-danger {
+            background-color: #dc3545;
+        }
+
+        .faculty-detail-card .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .faculty-detail-card .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .faculty-detail-card .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        /* ================================================================
+            Responsive Design
+        ================================================================ */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .faculty-detail-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <h1>College Management System</h1>
+    </header>
+
+    <!-- Faculty Detail Content -->
+    <div class="container mt-5">
+        <div class="faculty-detail-card">
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    {% if faculty.profile_picture %}
+                    <img src="{{ faculty.profile_picture.url }}" alt="{{ faculty.name }}">
+                    {% else %}
+                    <img src="https://via.placeholder.com/150" alt="No Image">
+                    {% endif %}
+                </div>
+                <div class="col-md-8">
+                    <h4>{{ faculty.name }}</h4>
+                    <p><strong>Email:</strong> {{ faculty.email }}</p>
+                    <p><strong>Phone:</strong> {{ faculty.phone }}</p>
+                    <p><strong>Qualification:</strong> {{ faculty.qualification }}</p>
+                    <p><strong>Experience:</strong> {{ faculty.experience }} years</p>
+                    <p><strong>Subjects Taught:</strong> {{ faculty.subjects_taught }}</p>
+
+                    <div class="mt-4">
+                        <a href="{% url 'edit_faculty' faculty.pk %}" class="btn btn-warning">Edit</a>
+                        <form action="{% url 'delete_faculty' faculty.pk %}" method="POST" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this faculty member?');">Delete</button>
+                        </form>
+                        <a href="{% url 'faculty_list' %}" class="btn btn-secondary">Back</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Faculty Management System. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

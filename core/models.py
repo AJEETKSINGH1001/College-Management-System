@@ -30,7 +30,7 @@ class Student(models.Model):
     fee_paid = models.BooleanField(default=False)
     admission_date = models.DateField(auto_now_add=True)
     some_field = models.CharField(max_length=100, blank=True, null=True)  # Additional field
-    profile_image = models.ImageField(upload_to='student_documents/',)
+    profile_image = models.ImageField(upload_to='student_documents/', blank=True, null=True)
 
     def save(self, *args, **kwargs):
         # Automatically set `some_field` based on `fee_paid`
@@ -56,3 +56,16 @@ class Student(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.enrollment_number})"
+
+class Faculty(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+    phone = models.CharField(max_length=15)
+    qualification = models.CharField(max_length=200)
+    # = models.CharField(max_length=100)
+    experience = models.PositiveIntegerField(help_text="Experience in years")
+    subjects_taught = models.TextField(help_text="List of subjects taught")
+    profile_picture = models.ImageField(upload_to='faculty_pictures/', blank=True, null=True)
+
+    def __str__(self):
+        return self.name

@@ -3,7 +3,8 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 
 from core.models import CustomUser, Student
-
+from django import forms
+from .models import Faculty
 
 class LoginForm(AuthenticationForm):
     # Customizing the fields for better form UI
@@ -71,4 +72,14 @@ class CustomUserRegistrationForm(forms.Form):
 class StudentAdmissionForm:
     def save(self):
         pass
+
+
+
+class FacultyForm(forms.ModelForm):
+    class Meta:
+        model = Faculty
+        fields = ['name', 'email', 'phone', 'qualification', 'experience', 'subjects_taught', 'profile_picture']
+        widgets = {
+            'subjects_taught': forms.Textarea(attrs={'rows': 3}),
+        }
 
