@@ -2,7 +2,7 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 
-from core.models import CustomUser, Student
+from core.models import CustomUser, Student, Feedback
 from django import forms
 from .models import Faculty
 
@@ -81,5 +81,14 @@ class FacultyForm(forms.ModelForm):
         fields = ['name', 'email', 'phone', 'qualification', 'experience', 'subjects_taught', 'profile_picture']
         widgets = {
             'subjects_taught': forms.Textarea(attrs={'rows': 3}),
+        }
+
+class FeedbackForm(forms.ModelForm):
+    class Meta:
+        model = Feedback
+        fields = ['faculty', 'rating', 'comments']
+        widgets = {
+            'faculty': forms.HiddenInput(),
+            'rating': forms.Select(choices=[(i, i) for i in range(1, 6)]),
         }
 

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CustomUser, Student
+from .models import CustomUser, Student, Course1, Schedule
 from django.contrib.auth.admin import UserAdmin
 from .models import Student
 from .models import Faculty
@@ -29,6 +29,7 @@ admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Student)
 admin.site.register(Faculty)
 #admin.site.register(Attendance)
-
+admin.site.register(Course1)
+admin.site.register(Schedule)
 
 

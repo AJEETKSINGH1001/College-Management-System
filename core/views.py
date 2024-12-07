@@ -4,9 +4,11 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+
+from . import models
 from .decorators import role_required
 from .forms import StudentAdmissionForm, CustomUserRegistrationForm
-from .models import Student
+from .models import Student, Course1, Feedback
 from django.http import HttpResponse
 from io import BytesIO
 from reportlab.pdfgen import canvas
@@ -25,6 +27,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Faculty
 from .forms import FacultyForm
 from django.contrib.admin.views.decorators import staff_member_required
+from .models import Faculty, Course, Schedule
 
 # Home page view
 def home(request):
@@ -127,6 +130,7 @@ def student_admission(request):
 
 
 # Student profiles list view
+
 def student_profiles(request):
     students = Student.objects.all()
     return render(request, 'student_profiles.html', {'students': students})
@@ -240,12 +244,43 @@ def pay_fee(request):
     return render(request, 'core/pay_fee.html')  # Ensure this points to your HTML file
 
 
-@staff_member_required
+from django.core.paginator import Paginator
+@login_required
 def faculty_list(request):
-    faculty_members = Faculty.objects.all()
-    return render(request, 'faculty/faculty_list.html', {'faculty_members': faculty_members})
+    # Determine user role
+    user_role = None
+    if request.user.is_authenticated:
+        if request.user.is_staff:  # Assuming staff means admin
+            user_role = 'admin'
+        elif request.user.groups.filter(name='Faculty').exists():
+            user_role = 'faculty'
+        else:
+            user_role = 'student'
 
+    # Filter faculty members by search query (if any)
+    search_query = request.GET.get('search', '')
+    faculty_members = Faculty.objects.all()
+    if search_query:
+        faculty_members = faculty_members.filter(
+            name__icontains=search_query
+        ) | faculty_members.filter(
+            email__icontains=search_query
+        )
+
+    # Pagination
+    paginator = Paginator(faculty_members, 10)  # Show 10 faculty members per page
+    page_number = request.GET.get('page')
+    faculty_members = paginator.get_page(page_number)
+
+    # Render the template with all context
+    return render(request, 'faculty/faculty_list.html', {
+        'faculty_members': faculty_members,
+        'search_query': search_query,
+        'user_role': user_role,  # Pass user role for role-based logic in the template
+    })
 # Add a new faculty profile
+@staff_member_required
+@role_required(['admin'])
 def add_faculty(request):
     if request.method == "POST":
         form = FacultyForm(request.POST, request.FILES)
@@ -274,11 +309,19 @@ class FacultyUpdateView(UpdateView):
     success_url = reverse_lazy('faculty_list')  # Redirect after successful edit
 
 # View a specific faculty profile
+@staff_member_required
 def faculty_detail(request, pk):
     faculty = get_object_or_404(Faculty, pk=pk)
-    return render(request, 'faculty/faculty_detail.html', {'faculty': faculty})
+    feedbacks = faculty.feedbacks.all()
+    avg_rating = feedbacks.aggregate(Avg('rating'))['rating__avg']
+    return render(request, 'faculty/faculty_detail.html', {
+        'faculty': faculty,
+        'feedbacks': feedbacks,
+        'avg_rating': avg_rating,
+    })
 
-
+@staff_member_required
+@role_required(['admin'])
 def edit_faculty(request, pk):
     faculty = get_object_or_404(Faculty, pk=pk)
     if request.method == 'POST':
@@ -300,10 +343,205 @@ class FacultyDeleteView(DeleteView):
     template_name = 'faculty_confirm_delete.html'
     success_url = reverse_lazy('faculty_list')  # Redirect after successful deletion
 
-
+@staff_member_required
+@role_required(['admin'])
 def delete_faculty(request, pk):
     faculty = get_object_or_404(Faculty, pk=pk)
     if request.method == 'POST':
         faculty.delete()
         return redirect('faculty_list')
     return redirect('faculty_detail', pk=pk)
+
+
+from .models import Faculty, Course
+@staff_member_required
+@role_required(['admin'])
+def class_scheduling(request):
+    # Fetch all faculty and courses
+    faculty_members = Faculty.objects.all()
+    courses = Course1.objects.all()
+
+    return render(request, 'faculty/class_scheduling.html', {
+        'faculty_members': faculty_members,
+        'courses': courses
+    })
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import Schedule
+import datetime
+
+@staff_member_required
+@role_required(['admin'])
+def save_schedule(request):
+    if request.method == 'POST':
+        faculty_id = request.POST.get('faculty')
+        course_id = request.POST.get('course')
+        schedule_date = request.POST.get('schedule_date')  # Get schedule_date from the form
+        schedule_time = request.POST.get('schedule_time')  # Get schedule_time from the form
+
+        # Check if schedule_time is provided
+        if not schedule_time:
+            messages.error(request, "Schedule time is required.")
+            return redirect('class_scheduling')
+
+        # Parse the schedule_time to ensure it's in the correct format (HH:MM)
+        try:
+            # Ensure that schedule_time is parsed into a proper time object
+            schedule_time = datetime.datetime.strptime(schedule_time, '%H:%M').time()
+        except ValueError:
+            messages.error(request, "Invalid time format. Please use the correct time format (HH:MM).")
+            return redirect('class_scheduling')
+
+        # Create a schedule entry
+        try:
+            Schedule.objects.create(
+                faculty_id=faculty_id,
+                course_id=course_id,
+                schedule_date=schedule_date,  # Ensure schedule_date is also passed correctly
+                schedule_time=schedule_time  # Save the time as a TimeField
+            )
+            messages.success(request, "Class schedule saved successfully!")
+        except Exception as e:
+            messages.error(request, f"Error saving schedule: {str(e)}")
+
+        # After saving, redirect to timetable page to show the schedule
+        return redirect('view_timetable')
+
+    # views.py
+
+    def view_timetable(request):
+        # Fetch all the schedules
+        schedules = Schedule.objects.all()
+
+        # Filter by faculty if a faculty ID is provided
+        faculty_id = request.GET.get('faculty')
+        if faculty_id:
+            schedules = schedules.filter(faculty_id=faculty_id)
+
+        # Get all faculty members for the filter dropdown
+        faculty_members = Faculty.objects.all()
+
+        return render(request, 'faculty/view_timetable.html', {
+            'schedules': schedules,
+            'faculty_members': faculty_members,
+            'selected_faculty_id': faculty_id  # Pass the selected faculty ID to maintain the filter state
+        })
+
+
+# views.py
+
+def view_timetable(request):
+    # Fetch all the schedules
+    schedules = Schedule.objects.all()
+
+    # Filter by faculty if a faculty ID is provided in the GET request
+    faculty_id = request.GET.get('faculty')
+    if faculty_id:
+        schedules = schedules.filter(faculty_id=faculty_id)
+
+    # Get all faculty members for the filter dropdown
+    faculty_members = Faculty.objects.all()
+
+    # Handle PDF generation if requested
+    if 'export_pdf' in request.GET:
+        # Create a buffer for the PDF
+        buffer = BytesIO()
+
+        # Create a PDF Canvas
+        pdf = canvas.Canvas(buffer, pagesize=letter)
+        pdf.setFont("Helvetica-Bold", 16)
+        pdf.drawString(220, 750, "Class Timetable")
+        pdf.setFont("Helvetica", 12)
+
+        # Set up column headers
+        y = 700
+        pdf.drawString(50, y, "Faculty")
+        pdf.drawString(200, y, "Course")
+        pdf.drawString(400, y, "Schedule")
+        pdf.line(50, y - 10, 550, y - 10)  # Draw a line under headers
+        y -= 30
+
+        # Populate rows
+        for schedule in schedules:
+            pdf.drawString(50, y, schedule.faculty.name)
+            pdf.drawString(200, y, schedule.course.name)
+            pdf.drawString(400, y, schedule.schedule_time.strftime("%I:%M %p"))  # Format time properly
+            y -= 20
+
+            # Avoid writing beyond the page boundary
+            if y < 50:
+                pdf.showPage()
+                pdf.setFont("Helvetica", 12)
+                y = 750
+
+        # Save and return the PDF response
+        pdf.save()
+        buffer.seek(0)
+        response = HttpResponse(buffer, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="timetable.pdf"'
+        return response
+
+    # Render the HTML template
+    return render(request, 'faculty/view_timetable.html', {
+        'schedules': schedules,
+        'faculty_members': faculty_members,
+        'selected_faculty_id': faculty_id,  # Pass the selected faculty ID to maintain the filter state
+    })
+
+
+from django.db.models import Avg
+from .models import Faculty, Feedback
+from .forms import FeedbackForm
+
+from django.db.models import Avg
+from .models import Faculty, Feedback, Performance
+from .forms import FeedbackForm
+
+@login_required
+def submit_feedback(request, faculty_id):
+    # Get the faculty object (if not found, it will return a 404 error)
+    faculty = get_object_or_404(Faculty, id=faculty_id)
+
+    if request.method == 'POST':
+        # Extract feedback data from the form
+        rating = int(request.POST.get('rating'))
+        comments = request.POST.get('comments')
+
+        # Create a new feedback entry
+        Feedback.objects.create(
+            faculty=faculty,
+            student=request.user,
+            rating=rating,
+            comments=comments
+        )
+
+        # Recalculate the average rating for the faculty
+        feedbacks = Feedback.objects.filter(faculty=faculty)
+        avg_rating = feedbacks.aggregate(Avg('rating'))['rating__avg']
+
+            # If the faculty does not have a performance, create a new performance record
+
+        # Also update the average rating directly on the faculty model
+        faculty.avg_rating = avg_rating if avg_rating else 0.0  # Ensure the field is not None
+        faculty.save()
+
+        # Redirect to the faculty list page after submission
+        return redirect('faculty_list')  # Replace 'faculty_list' with the correct URL name if needed
+
+    return render(request, 'faculty/submit_feedback.html', {'faculty': faculty})
+
+from django.db.models import Avg
+def update_performance(faculty_id):
+    faculty = Faculty.objects.get(id=faculty_id)
+    feedbacks = Feedback.objects.filter(faculty=faculty)
+    avg_rating = feedbacks.aggregate(Avg('rating'))['rating__avg'] or 0.0
+    faculty.performance.average_rating = avg_rating
+    faculty.performance.save()
+
+def admin_performance_dashboard(request):
+    faculties = Faculty.objects.all().select_related('performance')
+    return render(request, 'admin/faculty_performance_dashboard.html', {'faculties': faculties})
+
+
+

@@ -1,3 +1,5 @@
+{% load custom_filters %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -40,7 +42,8 @@
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         }
 
-        .faculty-table th, .faculty-table td {
+        .faculty-table th,
+        .faculty-table td {
             text-align: center;
         }
 
@@ -61,7 +64,10 @@
             color: white;
         }
 
-        .view-btn, .edit-btn, .delete-btn {
+        .view-btn,
+        .edit-btn,
+        .delete-btn,
+        .feedback-btn {
             font-size: 14px;
         }
 
@@ -89,15 +95,50 @@
             background-color: #c82333;
         }
 
+        .feedback-btn {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .feedback-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Search box styling */
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        /* Pagination styling */
+        .pagination {
+            justify-content: center;
+        }
+
         /* Responsive design */
         @media (max-width: 768px) {
             .faculty-table {
                 padding: 15px;
             }
 
-            .faculty-table th, .faculty-table td {
+            .faculty-table th,
+            .faculty-table td {
                 font-size: 12px;
             }
+        }
+
+        /* Star rating style */
+        .stars {
+            display: inline-block;
+            font-size: 20px;
+            color: #ff9800;
+        }
+
+        .star {
+            display: inline-block;
+        }
+
+        .star-empty {
+            color: #e0e0e0;
         }
     </style>
 </head>
@@ -110,14 +151,40 @@
         </div>
     </header>
 
+<!-- Dashboard Button -->
+<div class="container mt-3 text-end">
+    {% if user_role == 'admin' %}
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-warning">Dashboard</a>
+    {% elif user_role == 'faculty' %}
+        <a href="{% url 'faculty_dashboard' %}" class="btn btn-warning">Dashboard</a>
+    {% elif user_role == 'student' %}
+        <a href="{% url 'student_dashboard' %}" class="btn btn-warning">Dashboard</a>
+    {% else %}
+        <!-- Optional: Handle cases where the user_role is not set or invalid -->
+        <a href="{% url 'home' %}" class="btn btn-warning">Home</a>
+    {% endif %}
+</div>
+
     <!-- Main content -->
     <div class="container content-section">
         <div class="faculty-table">
             <h2 class="text-center mb-4">Faculty Profiles</h2>
 
             <!-- Add Faculty Button -->
+            {% if user_role == 'admin' %}
             <div class="text-end mb-3">
                 <a href="{% url 'add_faculty' %}" class="btn add-faculty-btn">Add Faculty</a>
+            </div>
+            {% endif %}
+
+            <!-- Search Box -->
+            <div class="search-box">
+                <form method="GET" action="{% url 'faculty_list' %}">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="search" placeholder="Search by Name or Email" value="{{ request.GET.search }}">
+                        <button class="btn btn-primary" type="submit">Search</button>
+                    </div>
+                </form>
             </div>
 
             <!-- Faculty Table -->
@@ -128,6 +195,7 @@
                         <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
+                        <th>Average Rating</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -145,14 +213,57 @@
                         <td>{{ faculty.email }}</td>
                         <td>{{ faculty.phone }}</td>
                         <td>
-                            <a href="{% url 'faculty_detail' faculty.pk %}" class="btn view-btn btn-sm">View</a>
-                            <a href="{% url 'edit_faculty' faculty.pk %}" class="btn edit-btn btn-sm">Edit</a>
-                            <a href="{% url 'delete_faculty' faculty.pk %}" class="btn delete-btn btn-sm">Delete</a>
+                            <div class="stars">
+                                {% for i in 5|range_filter %}
+                                    <span class="star{% if i <= faculty.avg_rating|default:0 %} {% else %}-empty{% endif %}">&#9733;</span>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td>
+                            {% if user_role == 'admin' %}
+                                <a href="{% url 'faculty_detail' faculty.pk %}" class="btn view-btn btn-sm">View</a>
+                                <a href="{% url 'edit_faculty' faculty.pk %}" class="btn edit-btn btn-sm">Edit</a>
+                                <a href="{% url 'delete_faculty' faculty.pk %}" class="btn delete-btn btn-sm">Delete</a>
+                                <a href="{% url 'submit_feedback' faculty.pk %}" class="btn feedback-btn btn-sm">Feedback</a>
+                            {% elif user_role == 'faculty' %}
+                                <a href="{% url 'faculty_detail' faculty.pk %}" class="btn view-btn btn-sm">View</a>
+                            {% elif user_role == 'student' %}
+                               <!-- <a href="{% url 'faculty_detail' faculty.pk %}" class="btn view-btn btn-sm">View</a>-->
+                                <a href="{% url 'submit_feedback' faculty.pk %}" class="btn feedback-btn btn-sm">Feedback</a>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
+
+            <!-- Pagination -->
+            <nav>
+                <ul class="pagination">
+                    {% if faculty_members.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">First</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ faculty_members.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <span class="page-link">{{ faculty_members.number }}</span>
+                    </li>
+
+                    {% if faculty_members.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ faculty_members.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Next</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ faculty_members.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Last</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+
         </div>
     </div>
 

@@ -1,0 +1,25 @@
+<h2>Performance Summary</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Faculty Name</th>
+            <th>Department</th>
+            <th>Average Rating</th>
+            <th>Recent Feedback</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for faculty in faculties %}
+        <tr>
+            <td>{{ faculty.name }}</td>
+            <td>{{ faculty.department }}</td>
+            <td>{{ faculty.performance.average_rating|default:"N/A" }}</td>
+            <td>
+                {% for feedback in faculty.feedbacks.all|slice:":3" %}
+                    <p><strong>{{ feedback.student.username }}:</strong> {{ feedback.comments }}</p>
+                {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

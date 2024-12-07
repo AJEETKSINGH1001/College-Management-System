@@ -109,10 +109,11 @@
 
                 <!-- Example faculty-specific content -->
                 <ul>
-                    <li><a href="#">View Classes</a></li>
+                    <li><a href="{% url 'view_timetable' %}">View Class TimeTable</a></li>
                     <li><a href="#">Manage Students</a></li>
                     <li><a href="#">Course Materials</a></li>
                     <li><a href="#">Faculty Resources</a></li>
+                    <li><a href="{% url 'faculty_list' %}">View Feedback Rating of Faculties</a></li>
                     <!-- Add more faculty-specific functionalities here -->
                 </ul>
             </div>

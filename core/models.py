@@ -1,6 +1,9 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from CollegeManagementSystem import settings
+
+
 class CustomUser(AbstractUser):
     ROLE_CHOICES = [
         ('admin', 'Admin'),
@@ -66,6 +69,57 @@ class Faculty(models.Model):
     experience = models.PositiveIntegerField(help_text="Experience in years")
     subjects_taught = models.TextField(help_text="List of subjects taught")
     profile_picture = models.ImageField(upload_to='faculty_pictures/', blank=True, null=True)
+    avg_rating = models.FloatField(default=0.0)
+
 
     def __str__(self):
         return self.name
+
+
+class Course:
+    objects = None
+
+
+from core.models import Course  # Ensure the path is correct
+
+
+class Course1(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+import datetime
+class Schedule(models.Model):
+    faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course1, on_delete=models.CASCADE)  # Link to Course
+    schedule_date = models.DateField(default=datetime.date(2024, 1, 1))
+    schedule_time = models.TimeField(default=datetime.time(9, 0))  # Default to 9:00 AM
+
+    def __str__(self):
+        return f"{self.faculty} - {self.course}"
+
+from django.contrib.auth.models import User
+class Feedback(models.Model):
+    faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE, related_name='feedbacks')
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='feedbacks')
+    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])  # Ratings 1-5
+    comments = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    #rating = models.IntegerField(choices=[(1, 'Poor'), (2, 'Fair'), (3, 'Good'), (4, 'Very Good'), (5, 'Excellent')])
+    #comments = models.TextField()
+
+    def __str__(self):
+        return f"Feedback by {self.student} for {self.faculty} - {self.rating}"
+
+class Performance(models.Model):
+    faculty = models.OneToOneField(Faculty, on_delete=models.CASCADE)
+    average_rating = models.FloatField(default=0.0)
+
+    def __str__(self):
+        return f"Performance of {self.faculty.name}"
+
+
+class Avg:
+    pass
