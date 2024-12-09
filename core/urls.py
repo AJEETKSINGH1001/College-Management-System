@@ -29,6 +29,16 @@ urlpatterns = [
     path('save_schedule/', views.save_schedule, name='save_schedule'),
     path('view_timetable/', views.view_timetable, name='view_timetable'),
     path('faculty/<int:faculty_id>/feedback/', views.submit_feedback, name='submit_feedback'),
+    path('courses/', views.course_list, name='course_list'),
+    path('courses/add/', views.course_form, name='add_course'),
+    path('courses/<int:course_id>/edit/', views.course_form, name='edit_course'),
+    path('courses/<int:course_id>/delete/', views.course_delete, name='delete_course'),
+    path('courses/<int:course_id>/modules/', views.module_list, name='module_list'),
+    path('courses/<int:course_id>/modules/add/', views.module_form, name='add_module'),
+    path('courses/<int:course_id>/modules/<int:module_id>/edit/', views.module_form, name='edit_module'),
+    path('courses/<int:course_id>/modules/<int:module_id>/delete/', views.module_delete, name='delete_module'),
+    #path('courses/add/', views.course_form, name='add_course'),
+    path('courses/<int:course_id>/delete/', views.course_delete, name='course_delete'),
 
 ]
 

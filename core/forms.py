@@ -2,7 +2,7 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 
-from core.models import CustomUser, Student, Feedback
+from core.models import CustomUser, Student, Feedback, Courses, Module, Department
 from django import forms
 from .models import Faculty
 
@@ -91,4 +91,28 @@ class FeedbackForm(forms.ModelForm):
             'faculty': forms.HiddenInput(),
             'rating': forms.Select(choices=[(i, i) for i in range(1, 6)]),
         }
+
+
+class CourseForm(forms.ModelForm):
+    class Meta:
+        model = Courses
+        fields = ['name', 'code', 'credit_hours', 'department','duration_weeks',]
+        department = forms.ModelChoiceField(queryset=Department.objects.all(), empty_label="Select Department")
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter course name'}),
+            'code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter course code'}),
+            'credit_hours': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter credit hours'}),
+            'department': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Department or its sub section'}),
+            'duration_weeks': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter duration in weeks'}),
+
+            # 'department': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+
+class ModuleForm(forms.ModelForm):
+    class Meta:
+        model = Module
+        fields = ['courses', 'name', 'code', 'description', 'hours']
+
+
 

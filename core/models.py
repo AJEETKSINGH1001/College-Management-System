@@ -123,3 +123,29 @@ class Performance(models.Model):
 
 class Avg:
     pass
+
+
+class Courses(models.Model):
+    name = models.CharField(max_length=255)
+    code = models.CharField(max_length=20, unique=True)
+    description = models.TextField(blank=True)
+    credit_hours = models.IntegerField()
+    duration_weeks = models.IntegerField()
+    department = models.CharField(max_length=100)  # Can be replaced with a ForeignKey to a Department model
+    #duration_weeks = models.IntegerField()
+    def __str__(self):
+        return f"{self.name} ({self.code})"
+
+class Department(models.Model):
+     name = models.CharField(max_length=255)
+
+
+class Module(models.Model):
+    courses = models.ForeignKey(Courses, on_delete=models.CASCADE, related_name='modules')
+    name = models.CharField(max_length=255)
+    code = models.CharField(max_length=20, unique=True)
+    description = models.TextField(blank=True)
+    hours = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.name} ({self.code}) - {self.courses.name}"

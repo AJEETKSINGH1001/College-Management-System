@@ -4,11 +4,10 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-
-from . import models
+from . import models, apps
 from .decorators import role_required
-from .forms import StudentAdmissionForm, CustomUserRegistrationForm
-from .models import Student, Course1, Feedback
+from .forms import StudentAdmissionForm, CustomUserRegistrationForm, CourseForm, ModuleForm
+from .models import Student, Course1, Feedback, Module, Courses
 from django.http import HttpResponse
 from io import BytesIO
 from reportlab.pdfgen import canvas
@@ -543,5 +542,113 @@ def admin_performance_dashboard(request):
     faculties = Faculty.objects.all().select_related('performance')
     return render(request, 'admin/faculty_performance_dashboard.html', {'faculties': faculties})
 
+
+# List all courses
+
+from django.core.paginator import Paginator
+from django.db.models import Q
+from django.shortcuts import render
+
+@staff_member_required
+def course_list(request):
+    # Retrieve query parameters
+    department = apps.get_model('core', 'Department')
+    search_query = request.GET.get('search', '')
+    sort_field = request.GET.get('sort', 'name')  # Default sorting by name
+    page_number = request.GET.get('page', 1)  # Default to the first page
+
+    # Fetch all courses
+    courses = Courses.objects.all()
+
+    # Filter courses based on search query
+    if search_query:
+        courses = courses.filter(
+            Q(name__icontains=search_query) |
+            Q(code__icontains=search_query) |
+            Q(department__name__icontains=search_query)  # Ensure department is a ForeignKey
+        )
+
+    # Validate and apply sorting
+    valid_sort_fields = ['name', 'code', 'credit_hours', 'department__name']
+    if sort_field in valid_sort_fields:
+        courses = courses.order_by(sort_field)
+
+    # Paginate courses (10 items per page)
+    paginator = Paginator(courses, 10)
+    courses_page = paginator.get_page(page_number)
+
+    # Render the template with context
+    return render(request, 'courses/course_list.html', {
+        'courses': courses_page,
+        'search_query': search_query,
+        'sort_field': sort_field,
+    })
+
+
+# Add or edit a course
+from .forms import CourseForm
+
+
+from .forms import CourseForm
+from .models import Courses
+@staff_member_required
+def course_form(request, course_id=None):
+    # If the course_id is provided, fetch the course to edit
+    if course_id:
+        course = get_object_or_404(Courses, pk=course_id)  # Fetch the course by its ID
+        form = CourseForm(request.POST or None, instance=course)  # Populate the form with existing data
+    else:
+        form = CourseForm(request.POST or None)  # If no course_id, create a new course form
+
+    # Handling form submission
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()  # Save the course (create or update)
+            return redirect('course_list')  # Redirect to the course list page after saving
+
+    return render(request, 'courses/course_form.html', {'form': form})
+
+# Delete a course
+@staff_member_required
+def course_delete(request, course_id):
+    # Get the course object by its ID or raise a 404 if it doesn't exist
+    course = get_object_or_404(Courses, pk=course_id)  # Make sure 'Courses' is used, not 'Course'
+
+    # Handle the DELETE request
+    if request.method == 'POST':
+        #course = get_object_or_404(Course, id=course_id)
+        course.delete()  # Delete the course
+        return redirect('course_list')  # Redirect to course list after deletion
+
+    # Render confirmation page for course deletion (optional)
+    return render(request, 'courses/course_confirm_delete.html', {'course': course})
+
+# List modules of a course
+@staff_member_required
+def module_list(request, course_id):
+    course = get_object_or_404(Courses, id=course_id)
+    modules = course.modules.all()
+    return render(request, 'courses/module_list.html', {'course': course, 'modules': modules})
+
+# Add or edit a module
+@staff_member_required
+
+def module_form(request, course_id, module_id=None):
+    course = get_object_or_404(Course, id=course_id)
+    module = get_object_or_404(Module, id=module_id) if module_id else None
+    form = ModuleForm(request.POST or None, instance=module)
+    if form.is_valid():
+        module = form.save(commit=False)
+        module.course = course
+        module.save()
+        return redirect('module_list', course_id=course.id)
+    return render(request, 'courses/module_form.html', {'form': form, 'course': course})
+
+# Delete a module
+@staff_member_required
+def module_delete(request, course_id, module_id):
+    module = get_object_or_404(Module, id=module_id)
+    module.delete()
+    return redirect('module_list', course_id=course_id)
 
 
