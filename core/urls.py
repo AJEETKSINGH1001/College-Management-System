@@ -39,6 +39,10 @@ urlpatterns = [
     path('courses/<int:course_id>/modules/<int:module_id>/delete/', views.module_delete, name='delete_module'),
     #path('courses/add/', views.course_form, name='add_course'),
     path('courses/<int:course_id>/delete/', views.course_delete, name='course_delete'),
+    path('batches/', views.batch_list, name='batch_list'),
+    path('batches/add/', views.batch_add, name='batch_add'),
+    path('batches/<int:batch_id>/edit/', views.batch_edit, name='batch_edit'),
+    path('batches/<int:batch_id>/delete/', views.batch_delete, name='batch_delete'),
 
 ]
 

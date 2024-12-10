@@ -652,3 +652,63 @@ def module_delete(request, course_id, module_id):
     return redirect('module_list', course_id=course_id)
 
 
+
+# core/views.py
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Batch, Course
+from .forms import BatchForm
+@staff_member_required
+def batch_list(request):
+    batches = Batch.objects.all()
+    paginator = Paginator(batches, 10)  # Show 10 batches per page
+
+    page_number = request.GET.get('page')  # Get current page number from URL
+    page_obj = paginator.get_page(page_number)  # Get the page object for the current page
+
+    return render(request, 'batches/batch_list.html', {'page_obj': page_obj})
+
+from django.shortcuts import render, redirect
+from .forms import BatchForm
+
+@staff_member_required
+def batch_add(request):
+    if request.method == 'POST':
+        form = BatchForm(request.POST)
+        if form.is_valid():
+            try:
+                batch = form.save()  # Save the form without committing
+                batch.courses = form.cleaned_data['courses']  # Explicitly set the course
+                print(f"Debug: Batch before saving - {batch}")
+                batch.save()  # Save the batch instance
+                print("Batch saved successfully.")
+                return redirect('batch_list')  # Redirect to batch list
+            except Exception as e:
+                print(f"Error during batch save: {e}")
+        else:
+            print("Form errors:", form.errors)  # Print form errors
+    else:
+        form = BatchForm()
+
+    return render(request, 'batches/batch_form.html', {'form': form})
+
+@staff_member_required
+def batch_edit(request, batch_id):
+    batch = get_object_or_404(Batch, id=batch_id)
+    if request.method == 'POST':
+        form = BatchForm(request.POST, instance=batch)
+        if form.is_valid():
+            form.save()
+            return redirect('batch_list')
+    else:
+        form = BatchForm(instance=batch)
+
+    return render(request, 'batches/batch_form.html', {'form': form})
+
+@staff_member_required
+def batch_delete(request, batch_id):
+    batch = get_object_or_404(Batch, id=batch_id)
+    if request.method == 'POST':
+        batch.delete()
+        return redirect('batch_list')
+    return render(request, 'batches/batch_confirm_delete.html', {'batch': batch})

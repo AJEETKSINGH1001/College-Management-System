@@ -4,6 +4,10 @@ from django.contrib.auth.admin import UserAdmin
 from .models import Student
 from .models import Faculty
 
+
+#from .models import Batch
+
+
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
     list_display = ['username', 'first_name', 'last_name', 'role', 'is_staff', 'is_active', 'date_joined']
@@ -24,6 +28,16 @@ class CustomUserAdmin(UserAdmin):
         }),
     )
 
+from django.contrib import admin
+from .models import Batch
+
+@admin.register(Batch)
+class BatchAdmin(admin.ModelAdmin):
+    list_display = ['name', 'courses', 'semester', 'stream', 'created_at']
+    list_filter = ['courses', 'semester', 'stream']
+    search_fields = ['name', 'course__name']
+
+
 # Register CustomUser model with the custom UserAdmin
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Student)
@@ -33,5 +47,6 @@ admin.site.register(Course1)
 admin.site.register(Schedule)
 admin.site.register(Courses)
 admin.site.register(Module)
+#admin.site.register(Batch)
 
 

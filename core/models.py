@@ -149,3 +149,25 @@ class Module(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.code}) - {self.courses.name}"
+
+# core/models.py
+
+from django.db import models
+
+class Course(models.Model):
+    name = models.CharField(max_length=100)
+    code = models.CharField(max_length=10)
+    # Other fields...
+
+    def __str__(self):
+        return self.name
+
+class Batch(models.Model):
+    name = models.CharField(max_length=100)
+    courses = models.ForeignKey(Courses, on_delete=models.CASCADE, related_name="batches")
+    semester = models.IntegerField()
+    stream = models.CharField(max_length=100, blank=True, null=True)  # Optional stream
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.courses.name}"

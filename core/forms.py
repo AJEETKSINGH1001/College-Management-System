@@ -5,6 +5,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from core.models import CustomUser, Student, Feedback, Courses, Module, Department
 from django import forms
 from .models import Faculty
+#from .views import Batch
+
 
 class LoginForm(AuthenticationForm):
     # Customizing the fields for better form UI
@@ -115,4 +117,18 @@ class ModuleForm(forms.ModelForm):
         fields = ['courses', 'name', 'code', 'description', 'hours']
 
 
+# core/forms.py
 
+from django import forms
+from .models import Batch
+
+class BatchForm(forms.ModelForm):
+    class Meta:
+        model = Batch
+        fields = ['name', 'courses', 'semester', 'stream']
+
+    courses = forms.ModelChoiceField(
+        queryset=Courses.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        empty_label="Select a Course"  # Optional placeholder
+    )
