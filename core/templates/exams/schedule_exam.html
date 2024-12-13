@@ -1,0 +1,129 @@
+{% block content %}
+<div class="container mt-5">
+    <!-- Header Section -->
+    <header class="text-center mb-5">
+        <h1>Examination Management</h1>
+    </header>
+
+    <!-- Schedule an Exam Form -->
+    <div class="form-container">
+        <h2 class="text-center">Schedule an Exam</h2>
+        <form method="post" class="mt-4">
+            {% csrf_token %}
+
+            <!-- Render Form Fields -->
+            <div class="form-group">
+                {{ form.as_p }}
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button type="submit" class="btn btn-submit">Submit</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="text-center mt-5">
+        <p>&copy; 2024 College Management System. All rights reserved.</p>
+    </footer>
+</div>
+
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f7fc;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* ================================================================
+        Header Styles
+    ================================================================ */
+    header {
+        background-color: #007bff;
+        color: white;
+        padding: 20px 0;
+        text-align: center;
+    }
+
+    /* ================================================================
+        Footer Styles
+    ================================================================ */
+    footer {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 0;
+        text-align: center;
+        position: fixed;
+        width: 100%;
+        bottom: 0;
+    }
+
+    /* Container Styling */
+    .container {
+        padding: 50px 15px;
+    }
+
+    .form-container {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+    }
+
+    .form-container h2 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    /* Form Styling */
+    .form-group label {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        font-size: 14px;
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+
+    .btn-submit {
+        background-color: #007bff;
+        color: white;
+        font-weight: bold;
+        padding: 14px 40px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        background-color: #0056b3;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .container {
+            padding: 20px;
+        }
+
+        .form-container {
+            padding: 20px;
+        }
+    }
+</style>
+{% endblock %}

@@ -712,3 +712,96 @@ def batch_delete(request, batch_id):
         batch.delete()
         return redirect('batch_list')
     return render(request, 'batches/batch_confirm_delete.html', {'batch': batch})
+
+
+
+import csv
+from .forms import StudentCSVUploadForm
+from .models import StudentDetails
+@staff_member_required
+def upload_students_csv(request):
+    if request.method == "POST":
+        form = StudentCSVUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            csv_file = form.cleaned_data['csv_file']
+            try:
+                decoded_file = csv_file.read().decode('utf-8').splitlines()
+                reader = csv.DictReader(decoded_file)
+
+                for row in reader:
+                    StudentDetails.objects.update_or_create(
+                        enrollment_number=row['Enrollment Number'],
+                        defaults={
+                            'roll_number': row['Roll Number'],
+                            'name': row['Name'],
+                            'course': row['Course'],
+                            'subjects': row['Subjects'],  # Assuming comma-separated
+                            'semester': row['Semester'],
+                            'batch': row['Batch'],
+                        }
+                    )
+                messages.success(request, "Students data uploaded successfully!")
+                return redirect('upload_students_csv')
+            except Exception as e:
+                messages.error(request, f"Error processing CSV file: {e}")
+    else:
+        form = StudentCSVUploadForm()
+
+    return render(request, 'student_details/upload_students_csv.html', {'form': form})
+
+from django.http import HttpResponse
+import os
+
+@staff_member_required
+def download_sample_csv(request):
+    # Specify the absolute path to the sample CSV file
+    sample_csv_path = os.path.join('core/templates/student_details/sample_students_upload.csv')  # Ensure 'sample.csv' exists in the static directory
+
+    if os.path.exists(sample_csv_path):
+        with open(sample_csv_path, 'r') as file:
+            response = HttpResponse(file.read(), content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="sample_students_upload.csv"'
+            return response
+    else:
+        return HttpResponse("Sample CSV file not found.", status=404)
+
+from django.shortcuts import render
+from .models import StudentDetails
+from django.db.models import Q
+
+@staff_member_required
+def search_students(request):
+    query = None
+    student = None
+
+    if request.method == "GET":
+        query = request.GET.get('query', None)
+        if query:
+            # Search for students by enrollment_number or roll_number
+            student = StudentDetails.objects.filter(
+                Q(enrollment_number__icontains=query) | Q(roll_number__icontains=query)
+            ).first()  # Get the first match or None if no match
+
+    return render(request, 'student_details/search_students.html', {'student': student, 'query': query})
+
+
+from .models import Exam
+from .forms import ExamForm
+from django.contrib import messages
+
+@login_required
+@role_required(['admin'])
+def schedule_exam(request):
+    if request.method == 'POST':
+        form = ExamForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Exam scheduled successfully!")
+            return redirect('view_exams')
+    else:
+        form = ExamForm()
+    return render(request, 'exams/schedule_exam.html', {'form': form})
+
+def view_exams(request):
+    exams = Exam.objects.all()
+    return render(request, 'exams/view_exams.html', {'exams': exams})

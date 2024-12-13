@@ -1,0 +1,167 @@
+{% block content %}
+<div class="container mt-5">
+    <!-- Header Section -->
+    <header class="text-center mb-5">
+        <h1>Examination Management</h1>
+    </header>
+
+    <!-- Scheduled Exams Table -->
+    <div class="form-container">
+        <h2 class="text-center">Scheduled Exams</h2>
+        <table class="table table-bordered table-hover mt-4">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Exam Name</th>
+                    <th>Course</th>
+                    <th>Subject</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Venue</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for exam in exams %}
+                <tr>
+                    <td>{{ exam.exam_name }}</td>
+                    <td>{{ exam.course11 }}</td>
+                    <td>{{ exam.subjects }}</td>
+                    <td>{{ exam.date }}</td>
+                    <td>{{ exam.time }}</td>
+                    <td>{{ exam.venue }}</td>
+                    <td>
+                        <a href="#" class="btn btn-info btn-sm">Edit</a>
+                        <a href="#" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">No exams scheduled.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="text-center mt-5">
+        <p>&copy; 2024 College Management System. All rights reserved.</p>
+    </footer>
+</div>
+
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f7fc;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* ================================================================
+        Header Styles
+    ================================================================ */
+    header {
+        background-color: #007bff;
+        color: white;
+        padding: 20px 0;
+        text-align: center;
+    }
+
+    /* ================================================================
+        Footer Styles
+    ================================================================ */
+    footer {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 0;
+        text-align: center;
+        position: fixed;
+        width: 100%;
+        bottom: 0;
+    }
+
+    /* Container Styling */
+    .container {
+        padding: 50px 15px;
+    }
+
+    .form-container {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+    }
+
+    .form-container h2 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    /* Table Styling */
+    .table {
+        width: 100%;
+        text-align: center;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .table th,
+    .table td {
+        padding: 12px;
+        vertical-align: middle;
+    }
+
+    .thead-dark th {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .btn-sm {
+        font-size: 14px;
+        padding: 5px 10px;
+        border-radius: 5px;
+        margin: 2px;
+    }
+
+    .btn-info {
+        background-color: #17a2b8;
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-info:hover {
+        background-color: #138496;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .container {
+            padding: 20px;
+        }
+
+        .form-container {
+            padding: 20px;
+        }
+
+        .btn-sm {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    }
+</style>
+{% endblock %}

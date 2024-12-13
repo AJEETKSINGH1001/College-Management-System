@@ -171,3 +171,34 @@ class Batch(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.courses.name}"
+
+
+from django.db import models
+
+class StudentDetails(models.Model):
+    enrollment_number = models.CharField(max_length=50, unique=True)
+    roll_number = models.CharField(max_length=50)
+    name = models.CharField(max_length=100)
+    image = models.ImageField(upload_to='student_images/', blank=True, null=True)
+    course = models.CharField(max_length=100)
+    subjects = models.TextField()  # Comma-separated subject names
+    semester = models.IntegerField()
+    batch = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.name} ({self.enrollment_number})"
+
+
+class Exam(models.Model):
+    exam_name = models.CharField(max_length=255)
+    date = models.DateField()
+    time = models.TimeField()
+    venue = models.CharField(max_length=255)
+    course11 = models.ForeignKey('Course1', on_delete=models.CASCADE)
+    subjects = models.ForeignKey('Courses', on_delete=models.CASCADE)
+    seating_arrangement = models.TextField(blank=True, help_text="Details about seating arrangement")
+
+    def __str__(self):
+        return f"{self.exam_name} - {self.subjects.name} on {self.date}"
+
+

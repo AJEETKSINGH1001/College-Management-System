@@ -132,3 +132,50 @@ class BatchForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-select'}),
         empty_label="Select a Course"  # Optional placeholder
     )
+
+
+from django import forms
+
+class StudentCSVUploadForm(forms.Form):
+    csv_file = forms.FileField(label="Upload CSV File")
+
+
+
+from django import forms
+from .models import Exam
+
+class ExamForm(forms.ModelForm):
+    class Meta:
+        model = Exam
+        fields = ['exam_name', 'date', 'time', 'venue', 'course11', 'subjects', 'seating_arrangement']
+        widgets = {
+            'exam_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter Exam Name'
+            }),
+            'date': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control'
+            }),
+            'time': forms.TimeInput(attrs={
+                'type': 'time',
+                'class': 'form-control'
+            }),
+            'venue': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter Venue'
+            }),
+            'course11': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'subjects': forms.Select(attrs={
+                'class': 'form-control',
+            }),
+            'seating_arrangement': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Provide Seating Arrangement Details',
+                'rows': 3
+            }),
+        }
+
+

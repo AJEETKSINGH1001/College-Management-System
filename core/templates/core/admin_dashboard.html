@@ -123,6 +123,12 @@
                 <form action="{% url 'batch_list' %}" method="get">
                     <button type="submit" class="btn btn-danger btn-dashboard">Add Batches</button>
                 </form>
+                                <form action="{% url 'search_students' %}" method="get">
+                    <button type="submit" class="btn btn-warning btn-dashboard">View Student</button>
+                </form>
+                <form action="{% url 'schedule_exam' %}" method="get">
+                    <button type="submit" class="btn btn-success btn-dashboard">Schedule Exams</button>
+                </form>
 
                 <!-- Add more admin-specific functionalities here -->
             </div>

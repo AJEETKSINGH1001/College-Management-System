@@ -129,12 +129,12 @@
                     <button type="submit" class="btn btn-warning btn-dashboard">Add Batches</button>
                 </form>
 
-                <form action="#" method="get">
-                    <button type="submit" class="btn btn-info btn-dashboard">Course Materials</button>
+                <form action="{% url 'search_students' %}" method="get">
+                    <button type="submit" class="btn btn-info btn-dashboard">View Student</button>
                 </form>
 
-                <form action="#" method="get">
-                    <button type="submit" class="btn btn-danger btn-dashboard">Faculty Resources</button>
+                <form action="{% url 'view_exams' %}" method="get">
+                    <button type="submit" class="btn btn-danger btn-dashboard">View Scheduled Exams</button>
                 </form>
 
                 <form action="{% url 'faculty_list' %}" method="get">

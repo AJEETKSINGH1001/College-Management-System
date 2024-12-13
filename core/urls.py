@@ -2,6 +2,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
+from .views import upload_students_csv
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -43,8 +44,13 @@ urlpatterns = [
     path('batches/add/', views.batch_add, name='batch_add'),
     path('batches/<int:batch_id>/edit/', views.batch_edit, name='batch_edit'),
     path('batches/<int:batch_id>/delete/', views.batch_delete, name='batch_delete'),
-
+    path('student_details/', upload_students_csv, name='upload_students_csv'),
+    path('download_sample_csv/', views.download_sample_csv, name='download_sample_csv'),
+    path('search-students/', views.search_students, name='search_students'),
+    path('schedule_exam/', views.schedule_exam, name='schedule_exam'),
+    path('view_exams/', views.view_exams, name='view_exams'),
 ]
+
 
 # Serve media files during development (only for local development, not in production)
 if settings.DEBUG:
