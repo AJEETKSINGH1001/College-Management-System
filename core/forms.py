@@ -149,33 +149,6 @@ class ExamForm(forms.ModelForm):
         model = Exam
         fields = ['exam_name', 'date', 'time', 'venue', 'course11', 'subjects', 'seating_arrangement']
         widgets = {
-            'exam_name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Enter Exam Name'
-            }),
-            'date': forms.DateInput(attrs={
-                'type': 'date',
-                'class': 'form-control'
-            }),
-            'time': forms.TimeInput(attrs={
-                'type': 'time',
-                'class': 'form-control'
-            }),
-            'venue': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Enter Venue'
-            }),
-            'course11': forms.Select(attrs={
-                'class': 'form-control'
-            }),
-            'subjects': forms.Select(attrs={
-                'class': 'form-control',
-            }),
-            'seating_arrangement': forms.Textarea(attrs={
-                'class': 'form-control',
-                'placeholder': 'Provide Seating Arrangement Details',
-                'rows': 3
-            }),
+            'date': forms.DateInput(attrs={'type': 'date'}),
+            'time': forms.TimeInput(attrs={'type': 'time'}),
         }
-
-

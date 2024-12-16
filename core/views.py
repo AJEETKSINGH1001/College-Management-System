@@ -802,6 +802,29 @@ def schedule_exam(request):
         form = ExamForm()
     return render(request, 'exams/schedule_exam.html', {'form': form})
 
+
 def view_exams(request):
-    exams = Exam.objects.all()
-    return render(request, 'exams/view_exams.html', {'exams': exams})
+    # Fetch all courses for the filter dropdown
+    courses = Course1.objects.all()
+
+    # Get the selected course from the query parameters
+    selected_course_id = request.GET.get('course')
+
+    # Filter exams by the selected course if provided
+    if selected_course_id and selected_course_id != 'all':
+        exams = Exam.objects.filter(course11_id=selected_course_id)
+    else:
+        exams = Exam.objects.all()
+
+    # Implement pagination: Show 10 exams per page
+    paginator = Paginator(exams, 10)  # 10 exams per page
+    page_number = request.GET.get('page')
+    exams_page = paginator.get_page(page_number)
+
+    # Pass courses, filtered exams, and pagination details to the template
+    context = {
+        'exams': exams_page,
+        'courses': courses,
+        'selected_course_id': selected_course_id,  # To preserve filter state
+    }
+    return render(request, 'exams/view_exams.html', context)
