@@ -202,3 +202,34 @@ class Exam(models.Model):
         return f"{self.exam_name} - {self.subjects.name} on {self.date}"
 
 
+# New Marks Model
+class Marks(models.Model):
+    student = models.ForeignKey(StudentDetails,null=True, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course1, on_delete=models.CASCADE)
+    courses = models.ForeignKey(Courses,null=True, on_delete=models.CASCADE)
+    exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
+    marks_obtained = models.FloatField()
+    total_marks = models.FloatField()
+
+    @property
+    def percentage(self):
+        return (self.marks_obtained / self.total_marks) * 100
+
+    @property
+    def gpa(self):
+        """Simple GPA calculation (Assuming 10-point scale)."""
+        return round((self.percentage / 10), 2)
+
+    def __str__(self):
+        return f"{self.student.name} - {self.course.name} - {self.exam.exam_name}"
+
+    class Result(models.Model):
+        roll_number = models.CharField(max_length=50)
+        course = models.ForeignKey(Course1, on_delete=models.CASCADE)
+        courses = models.CharField(max_length=100)
+        marks_obtained = models.IntegerField()
+        total_marks = models.IntegerField()
+        gpa = models.FloatField()
+
+        def __str__(self):
+            return f"{self.course.name} - {self.roll_number}"

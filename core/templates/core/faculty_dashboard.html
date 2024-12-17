@@ -136,6 +136,9 @@
                 <form action="{% url 'view_exams' %}" method="get">
                     <button type="submit" class="btn btn-danger btn-dashboard">View Scheduled Exams</button>
                 </form>
+                                <form action="{% url 'marks_management' %}" method="get">
+                    <button type="submit" class="btn btn-primary btn-dashboard">Add Student's marks</button>
+                </form>
 
                 <form action="{% url 'faculty_list' %}" method="get">
                     <button type="submit" class="btn btn-secondary btn-dashboard">View Feedback Rating of Faculties</button>

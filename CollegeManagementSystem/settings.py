@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'captcha',
 ]
 AUTH_USER_MODEL = 'core.CustomUser'
 LOGIN_REDIRECT_URL = '/'

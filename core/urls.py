@@ -49,6 +49,11 @@ urlpatterns = [
     path('search-students/', views.search_students, name='search_students'),
     path('schedule_exam/', views.schedule_exam, name='schedule_exam'),
     path('view_exams/', views.view_exams, name='view_exams'),
+    path('marks/', views.marks_management, name='marks_management'),
+    path('marks/add', views.add_marks, name='add_marks'),
+    path('result-publication/', views.result_publication, name='result_publication'),
+
+
 ]
 
 

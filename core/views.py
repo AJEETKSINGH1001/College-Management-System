@@ -4,7 +4,7 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from . import models, apps
+from . import models, apps, forms
 from .decorators import role_required
 from .forms import StudentAdmissionForm, CustomUserRegistrationForm, CourseForm, ModuleForm
 from .models import Student, Course1, Feedback, Module, Courses
@@ -828,3 +828,170 @@ def view_exams(request):
         'selected_course_id': selected_course_id,  # To preserve filter state
     }
     return render(request, 'exams/view_exams.html', context)
+
+
+from .models import Marks, Exam, Course1
+from .forms import MarksForm
+from django.db.models import Avg
+
+
+# View to list and manage marks
+from django.db.models import F, FloatField, ExpressionWrapper, Avg
+
+from .forms import MarksUploadForm
+@staff_member_required
+def marks_management(request):
+    # Annotate calculated GPA dynamically
+    marks_query = Marks.objects.select_related('student').annotate(
+        calculated_gpa=ExpressionWrapper(
+            F('marks_obtained') / F('total_marks') * 10.0,  # GPA out of 10
+            output_field=FloatField()
+        )
+    )
+
+    # Search by roll number or enrollment number
+    roll_number = request.GET.get('roll_number', '')
+    enrollment_number = request.GET.get('enrollment_number', '')
+    if roll_number:
+        marks_query = marks_query.filter(student__roll_number__icontains=roll_number)
+    if enrollment_number:
+        marks_query = marks_query.filter(student__enrollment_number__icontains=enrollment_number)
+
+    # Paginate marks list
+    paginator = Paginator(marks_query, 10)  # Show 10 records per page
+    page_number = request.GET.get('page')
+    marks_list = paginator.get_page(page_number)
+
+    # Calculate average GPA for display
+    avg_gpa = marks_query.aggregate(average_gpa=Avg('calculated_gpa'))['average_gpa'] or 0.0
+
+    # Handle CSV upload if POST request with file
+    if request.method == 'POST' and request.FILES.get('file'):
+        form = MarksUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            csv_file = request.FILES['file']
+
+            # Check if the file is a CSV
+            if not csv_file.name.endswith('.csv'):
+                return render(request, 'exams/marks_management.html', {
+                    'marks': marks_list,
+                    'avg_gpa': avg_gpa,
+                    'form': form,
+                    'error': 'Please upload a valid CSV file.'
+                })
+
+            # Read and process the CSV file
+            decoded_file = csv_file.read().decode('utf-8').splitlines()
+            reader = csv.DictReader(decoded_file)
+            error_rows = []  # Track rows with issues
+            for row in reader:
+                student_name = row.get('Student Name', '').strip()
+                roll_number = row.get('Roll Number', '').strip()
+                enrollment_number = row.get('Enrollment Number', '').strip()
+                course_name = row.get('Course', '').strip()
+                subject = row.get('Subject', '').strip()
+                exam_name = row.get('Exam', '').strip()
+                marks_obtained = row.get('Marks Obtained', '').strip()
+                total_marks = row.get('Total Marks', '').strip()
+                gpa = row.get('GPA', '').strip()
+
+                try:
+                    # Retrieve related objects
+                    student = StudentDetails.objects.get(
+                        student_name=student_name,
+                        roll_number=roll_number,
+                        enrollment_number=enrollment_number
+                    )
+                    course = Course.objects.get(name=course_name)
+                    exam = Exam.objects.get(exam_name=exam_name)
+
+                    # Create Marks entry
+                    Marks.objects.create(
+                        student=student,
+                        course=course,
+                        subject=subject,
+                        exam=exam,
+                        marks_obtained=float(marks_obtained),
+                        total_marks=float(total_marks),
+                        gpa=float(gpa)
+                    )
+                except (StudentDetails.DoesNotExist, Course.DoesNotExist, Exam.DoesNotExist) as e:
+                    error_rows.append({'row': row, 'error': str(e)})
+                    continue
+                except ValueError as ve:
+                    error_rows.append({'row': row, 'error': f"Invalid data: {ve}"})
+                    continue
+
+            # Provide feedback on the upload
+            if error_rows:
+                return render(request, 'exams/marks_management.html', {
+                    'marks': marks_list,
+                    'avg_gpa': avg_gpa,
+                    'form': form,
+                    'error_rows': error_rows,
+                    'success': 'CSV uploaded with some errors. Check details below.'
+                })
+
+            return redirect('marks_management')  # Redirect after successful upload
+
+    else:
+        form = MarksUploadForm()  # Empty form for file upload
+
+    # Render the template
+    return render(request, 'exams/marks_management.html', {
+        'marks': marks_list,
+        'avg_gpa': avg_gpa,
+        'form': form
+    })
+
+# View to add new marks
+@staff_member_required
+def add_marks(request):
+    if request.method == 'POST':
+        form = MarksForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('marks_management')
+    else:
+        form = MarksForm()
+
+    return render(request, 'exams/add_marks.html', {'form': form})
+
+
+# In core/views.py
+
+from django.shortcuts import render # Assume you have models for Course and Result
+from django.http import HttpResponse
+
+
+class ResultPublicationForm:
+    pass
+
+
+class Result:
+    pass
+
+
+def result_publication(request):
+    if request.method == 'POST':
+        form = ResultPublicationForm(request.POST)
+        if form.is_valid():
+            # Retrieve roll number, course, and validate the captcha
+            roll_number = form.cleaned_data['roll_number']
+            course = form.cleaned_data['course']
+
+            # Get the results for the given roll number and course
+            results = Result.objects.filter(roll_number=roll_number, course=course)
+
+            if results.exists():
+                return render(request, 'exams/result_publication.html', {'form': form, 'results': results})
+            else:
+                form.add_error(None, "No results found for the provided roll number and course.")
+        else:
+            return HttpResponse("Invalid CAPTCHA", status=400)  # In case CAPTCHA fails
+    else:
+        form = ResultPublicationForm()
+
+    return render(request, 'exams/result_publication.html', {'form': form})
+
+

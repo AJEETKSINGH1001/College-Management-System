@@ -2,7 +2,7 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 
-from core.models import CustomUser, Student, Feedback, Courses, Module, Department
+from core.models import CustomUser, Student, Feedback, Courses, Module, Department, Marks
 from django import forms
 from .models import Faculty
 #from .views import Batch
@@ -152,3 +152,67 @@ class ExamForm(forms.ModelForm):
             'date': forms.DateInput(attrs={'type': 'date'}),
             'time': forms.TimeInput(attrs={'type': 'time'}),
         }
+
+
+class MarksForm(forms.ModelForm):
+    class Meta:
+        model = Marks
+        fields = ['student', 'course', 'courses', 'exam', 'marks_obtained', 'total_marks']
+
+        # Add widgets for better UI
+        widgets = {
+            'student': forms.Select(attrs={
+                'class': 'form-control',
+                'placeholder': 'Select a student'
+            }),
+            'course': forms.Select(attrs={
+                'class': 'form-control',
+                'placeholder': 'Select a course'
+            }),
+            'courses': forms.Select(attrs={
+                'class': 'form-control',
+                'placeholder': 'Select courses'
+            }),
+            'exam': forms.Select(attrs={
+                'class': 'form-control',
+                'placeholder': 'Select an exam'
+            }),
+            'marks_obtained': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter marks obtained'
+            }),
+            'total_marks': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter total marks'
+            }),
+        }
+        labels = {
+            'student': 'Student Name',
+            'course': 'Course',
+            'courses': 'Courses',
+            'exam': 'Exam',
+            'marks_obtained': 'Marks Obtained',
+            'total_marks': 'Total Marks',
+        }
+
+
+from django import forms
+
+class MarksUploadForm(forms.Form):
+    file = forms.FileField()
+
+    def clean_file(self):
+        file = self.cleaned_data.get('file')
+        if not file.name.endswith('.csv'):
+            raise forms.ValidationError('Please upload a valid CSV file.')
+        return file
+
+
+from django import forms
+from .models import Course
+from captcha.fields import CaptchaField
+
+class ResultPublicationForm(forms.Form):
+    roll_number = forms.CharField(max_length=50, label="Roll Number", widget=forms.TextInput(attrs={'placeholder': 'Enter Roll Number'}))
+    course1 = forms.ModelChoiceField(queryset=Course.objects.all(), label="Course", widget=forms.Select(attrs={'class': 'form-control'}))
+    captcha = CaptchaField()
