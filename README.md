@@ -1,8 +1,8 @@
-# College Management System [https://college-management-system-rsvx.onrender.com/]
+# College Management System 
 
 ## Overview
 
-The **College Management System (CMS)** is a comprehensive software solution designed to automate and streamline the administrative, academic, and student-related activities of a college. This system integrates various features to enhance the management of students, faculty, courses, examinations, and more. It allows seamless management of college operations with a user-friendly interface for administrators, faculty, students, and parents.
+The **College Management System (CMS)**  https://college-management-system-rsvx.onrender.com/ is a comprehensive software solution designed to automate and streamline the administrative, academic, and student-related activities of a college. This system integrates various features to enhance the management of students, faculty, courses, examinations, and more. It allows seamless management of college operations with a user-friendly interface for administrators, faculty, students, and parents.
 
 ## Features
 
