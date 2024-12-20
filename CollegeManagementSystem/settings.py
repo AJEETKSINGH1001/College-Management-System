@@ -25,7 +25,11 @@ SECRET_KEY = 'django-insecure-o*5n&b2@csn34r2jik)#83^%*5n34z73z$53ws@)fwp-x$u-n1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'college-management-system-rsvx.onrender.com',  # Add your Render domain here
+    '127.0.0.1',  # Allow localhost for development
+    'localhost',
+]
 
 
 # Application definition
