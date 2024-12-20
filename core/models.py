@@ -204,10 +204,10 @@ class Exam(models.Model):
 
 # New Marks Model
 class Marks(models.Model):
-    student = models.ForeignKey(StudentDetails,null=True, on_delete=models.CASCADE)
+    student = models.ForeignKey(StudentDetails, on_delete=models.CASCADE)
     course = models.ForeignKey(Course1, on_delete=models.CASCADE)
     courses = models.ForeignKey(Courses,null=True, on_delete=models.CASCADE)
-    exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
+    exam = models.ForeignKey(Exam,null=True, on_delete=models.CASCADE)
     marks_obtained = models.FloatField()
     total_marks = models.FloatField()
 
@@ -223,13 +223,43 @@ class Marks(models.Model):
     def __str__(self):
         return f"{self.student.name} - {self.course.name} - {self.exam.exam_name}"
 
-    class Result(models.Model):
-        roll_number = models.CharField(max_length=50)
-        course = models.ForeignKey(Course1, on_delete=models.CASCADE)
-        courses = models.CharField(max_length=100)
-        marks_obtained = models.IntegerField()
-        total_marks = models.IntegerField()
-        gpa = models.FloatField()
+class Results(models.Model):
+    student = models.ForeignKey('StudentDetails', on_delete=models.CASCADE)
+    course = models.ForeignKey('Course1', on_delete=models.CASCADE)
+    courses = models.ForeignKey('Courses', null=True, on_delete=models.CASCADE)
+    exam = models.ForeignKey('Exam', null=True, on_delete=models.CASCADE)
+    semester = models.IntegerField()
+    batch = models.CharField(max_length=50)
+    total_marks_obtained = models.FloatField()  # Use FloatField for marks
+    total_max_marks = models.FloatField()  # Use FloatField for maximum marks
+    gpa = models.FloatField()
 
-        def __str__(self):
-            return f"{self.course.name} - {self.roll_number}"
+    @property
+    def percentage(self):
+        """Calculate the percentage based on total marks."""
+        return (self.total_marks_obtained / self.total_max_marks) * 100 if self.total_max_marks > 0 else 0
+
+    def save(self, *args, **kwargs):
+        """Automatically calculate GPA when saving."""
+        self.gpa = round(self.percentage / 10, 2)  # GPA on a 10-point scale
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.student.name} - {self.course.name} - Semester {self.semester}"
+
+
+class OnlineClassSession(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(StudentDetails, on_delete=models.CASCADE, related_name="teacher_sessions")
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    meeting_link = models.URLField(blank=True, null=True)  # This will hold the Zoom link
+    meeting_id = models.CharField(max_length=100, blank=True, null=True)
+    meeting_password = models.CharField(max_length=20, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.title} - {self.course.name}"

@@ -229,18 +229,32 @@
                     </a>
                 </div>
 
-                <!-- Dashboard Links -->
-                <div class="dashboard-links">
-                    <h3>Quick Links</h3>
-                    <ul>
-                        <li><a href="{% url 'pay_fee' %}">Pay Fee</a></li>
-                        <li><a href="{% url 'view_timetable' %}">View Classes TimeTable</a></li>
-                        <li><a href="{% url 'faculty_list' %}">Rate and Feedback Faculty/Faculties</a></li>
-                        <li><a href="#">View Attendance</a></li>
-                        <li><a href="#">Update Profile</a></li>
-                        <li><a href="#">Download Documents</a></li>
-                    </ul>
-                </div>
+<!-- Dashboard Links -->
+<div class="dashboard-links">
+    <h3>Quick Links</h3>
+    <ul>
+        <li>
+            <button type="button" class="btn btn-primary w-100 mb-2" onclick="window.location.href='{% url 'results_view' %}'">View Results</button>
+        </li>
+        <li>
+            <button type="button" class="btn btn-success w-100 mb-2" onclick="window.location.href='{% url 'pay_fee' %}'">Pay Fee</button>
+        </li>
+        <li>
+            <button type="button" class="btn btn-info w-100 mb-2" onclick="window.location.href='{% url 'view_timetable' %}'">View Classes TimeTable</button>
+        </li>
+        <li>
+            <button type="button" class="btn btn-warning w-100 mb-2" onclick="window.location.href='{% url 'faculty_list' %}'">Rate and Feedback Faculty/Faculties</button>
+        </li>
+        <li>
+            <button type="button" class="btn btn-secondary w-100 mb-2" onclick="window.location.href='#'">Download Documents</button>
+        </li>
+    <li>
+   <button type="button" class="btn btn-dark w-100 mb-2" onclick="window.location.href='zoommtg://zoom.us/j'">Join Online Class</button>
+    </li>
+
+    </ul>
+</div>
+
             </div>
         </div>
     </div>

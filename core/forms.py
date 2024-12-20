@@ -209,10 +209,34 @@ class MarksUploadForm(forms.Form):
 
 
 from django import forms
-from .models import Course
-from captcha.fields import CaptchaField
+from .models import Course1
 
-class ResultPublicationForm(forms.Form):
-    roll_number = forms.CharField(max_length=50, label="Roll Number", widget=forms.TextInput(attrs={'placeholder': 'Enter Roll Number'}))
-    course1 = forms.ModelChoiceField(queryset=Course.objects.all(), label="Course", widget=forms.Select(attrs={'class': 'form-control'}))
-    captcha = CaptchaField()
+from django.forms.widgets import TextInput, Select, NumberInput
+from .models import Course1
+
+class ResultsSearchForm(forms.Form):
+    enrollment_number = forms.CharField(
+        max_length=50,
+        required=True,
+        label="Enrollment Number",
+        widget=TextInput(attrs={
+            'style': 'width: 100%; height: 45px; font-size: 16px; padding: 10px; border: 1px solid #ced4da; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);',
+            'placeholder': 'Enter Enrollment Number'
+        })
+    )
+    course = forms.ModelChoiceField(
+        queryset=Course1.objects.all(),
+        required=True,
+        label="Course",
+        widget=Select(attrs={
+            'style': 'width: 100%; height: 45px; font-size: 16px; padding: 10px; border: 1px solid #ced4da; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); background-color: #f8f9fa;'
+        })
+    )
+    semester = forms.IntegerField(
+        required=True,
+        label="Semester",
+        widget=NumberInput(attrs={
+            'style': 'width: 100%; height: 45px; font-size: 16px; padding: 10px; border: 1px solid #ced4da; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);',
+            'placeholder': 'Enter Semester'
+        })
+    )

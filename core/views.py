@@ -967,31 +967,73 @@ from django.http import HttpResponse
 class ResultPublicationForm:
     pass
 
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse
+from .models import Results, StudentDetails, Course1
+from .forms import ResultsSearchForm
+from django.db.models import Sum
 
-class Result:
-    pass
-
-
-def result_publication(request):
+def results_view(request):
     if request.method == 'POST':
-        form = ResultPublicationForm(request.POST)
+        form = ResultsSearchForm(request.POST)
         if form.is_valid():
-            # Retrieve roll number, course, and validate the captcha
-            roll_number = form.cleaned_data['roll_number']
+            # Get the cleaned data from the form
+            enrollment_number = form.cleaned_data['enrollment_number']
             course = form.cleaned_data['course']
+            semester = form.cleaned_data['semester']
 
-            # Get the results for the given roll number and course
-            results = Result.objects.filter(roll_number=roll_number, course=course)
+            # Retrieve the student details and results
+            student = get_object_or_404(StudentDetails, enrollment_number=enrollment_number)
+            results = Results.objects.filter(student=student, course=course, semester=semester)
 
             if results.exists():
-                return render(request, 'exams/result_publication.html', {'form': form, 'results': results})
+                # Calculate grand totals and percentage
+                total_obtained = results.aggregate(Sum('total_marks_obtained'))['total_marks_obtained__sum'] or 0
+                total_max = results.aggregate(Sum('total_max_marks'))['total_max_marks__sum'] or 0
+                percentage = round((total_obtained / total_max) * 100, 2) if total_max > 0 else 0
+
+                # Render the results with totals and percentage
+                return render(request, 'exams/results_view.html', {
+                    'form': form,
+                    'results': results,
+                    'total_obtained': total_obtained,
+                    'total_max': total_max,
+                    'percentage': percentage,
+                })
             else:
-                form.add_error(None, "No results found for the provided roll number and course.")
-        else:
-            return HttpResponse("Invalid CAPTCHA", status=400)  # In case CAPTCHA fails
+                # Add an error if no results are found
+                return render(request, 'exams/results_view.html', {'form': form})
+
     else:
-        form = ResultPublicationForm()
+        form = ResultsSearchForm()
 
-    return render(request, 'exams/result_publication.html', {'form': form})
+    # Render the form for GET requests
+    return render(request, 'exams/results_view.html', {'form': form})
 
 
+from .models import OnlineClassSession, StudentDetails
+from django.utils import timezone
+
+
+def zoom_meeting_link(request):
+    # Assuming the user is a student
+    student = request.user.studentdetails
+    # Fetch the next class session for this student
+    upcoming_session = OnlineClassSession.objects.filter(batch=student.batch, start_time__gte=timezone.now()).first()
+
+    if upcoming_session:
+        # Redirect the student to the Zoom meeting link
+        return redirect(upcoming_session.meeting_link)
+    else:
+        # Handle the case where there is no upcoming session
+        return render(request, 'no_upcoming_class.html')
+
+
+def zoom_meeting_link_faculty(request):
+    teacher = request.user.studentdetails  # Assuming user is faculty
+    upcoming_session = OnlineClassSession.objects.filter(teacher=teacher, start_time__gte=timezone.now()).first()
+
+    if upcoming_session:
+        return redirect(upcoming_session.meeting_link)
+    else:
+        return render(request, 'no_upcoming_class.html')

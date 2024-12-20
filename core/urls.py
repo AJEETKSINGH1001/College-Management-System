@@ -51,7 +51,9 @@ urlpatterns = [
     path('view_exams/', views.view_exams, name='view_exams'),
     path('marks/', views.marks_management, name='marks_management'),
     path('marks/add', views.add_marks, name='add_marks'),
-    path('result-publication/', views.result_publication, name='result_publication'),
+    path('results_view/', views.results_view, name='results_view'),
+    path('zoom_meeting_link/', views.zoom_meeting_link, name='zoom_meeting_link'),
+    path('faculty_zoom_meeting_link/', views.zoom_meeting_link_faculty, name='zoom_meeting_link_faculty'),
 
 
 ]

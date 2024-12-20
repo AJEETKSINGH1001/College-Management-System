@@ -123,14 +123,22 @@
 
                 <p>As a parent, you can track your child's progress, view grades, and communicate with faculty.</p>
 
-                <!-- Example parent-specific content -->
-                <ul>
-                    <li><a href="#">View Child's Grades</a></li>
-                    <li><a href="#">Check Attendance</a></li>
-                    <li><a href="#">View Reports</a></li>
-                    <li><a href="#">Message Faculty</a></li>
-                    <!-- Add more parent-specific functionalities here -->
-                </ul>
+<!-- Example parent-specific content -->
+<ul>
+    <li>
+        <button type="button" class="btn btn-primary w-100 mb-2" onclick="window.location.href='{% url 'results_view' %}'">View Child's Results</button>
+    </li>
+    <li>
+        <button type="button" class="btn btn-success w-100 mb-2" onclick="window.location.href='{% url 'pay_fee' %}'">Pay Fee</button>
+    </li>
+    <li>
+        <button type="button" class="btn btn-info w-100 mb-2" onclick="window.location.href='#'">View Reports</button>
+    </li>
+    <li>
+        <button type="button" class="btn btn-warning w-100 mb-2" onclick="window.location.href='#'">Message Faculty</button>
+    </li>
+    <!-- Add more parent-specific functionalities here -->
+</ul>
             </div>
         </div>
     </div>
