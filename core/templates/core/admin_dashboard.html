@@ -132,7 +132,9 @@
                 <form action="{% url 'marks_management' %}" method="get">
                     <button type="submit" class="btn btn-primary btn-dashboard">Add Student's marks</button>
                 </form>
-
+                <form action="{% url 'upload_students_csv' %}" method="get">
+                    <button type="submit" class="btn btn-success btn-dashboard">Add Student Using CSV Upload</button>
+                </form>
                 <!-- Add more admin-specific functionalities here -->
             </div>
         </div>
